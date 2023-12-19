@@ -7,10 +7,8 @@ use Illuminate\Support\ServiceProvider;
 class RecommendationServiceProvider extends ServiceProvider
 {
 
-    public $lang = __DIR__ . '/../resources/lang';
     public $assets = __DIR__ . '/../resources/assets';
     public $views = __DIR__ . '/../resources/views';
-    public $database = __DIR__ . '/../database/migrations';
     public $config = __DIR__ . '/../config';
 
     /**
@@ -32,23 +30,9 @@ class RecommendationServiceProvider extends ServiceProvider
             );
         }
 
-        if ($this->app->runningInConsole() && $lang = $this->lang) {
-            $this->publishes(
-                [$lang => resource_path('lang')],
-                'mr4-lc-recommendation'
-            );
-        }
-
         if ($this->app->runningInConsole() && $views = $this->views) {
             $this->publishes(
                 [$views => resource_path('views/components/mr4-lc')],
-                'mr4-lc-recommendation'
-            );
-        }
-
-        if ($this->app->runningInConsole() && $database = $this->database) {
-            $this->publishes(
-                [$database => database_path('migrations')],
                 'mr4-lc-recommendation'
             );
         }
