@@ -1,0 +1,71 @@
+.mr4-lc-recommendation {
+  text-align: center;
+  margin-bottom: 25px;
+}
+
+.container {
+  width: 100%;
+}
+
+.container .items {
+  display: grid;
+  text-align: left;
+  gap: 10px;
+  width: 100%;
+}
+
+@media only screen and (min-width: 768px) {
+  .container .items {
+    grid-template-columns: auto;
+  }
+}
+@media only screen and (min-width: 1024px) {
+  .container .items {
+    grid-template-columns: auto auto auto;
+  }
+}
+@media only screen and (min-width: 1900px) {
+  .container .items {
+    grid-template-columns: auto auto auto auto auto;
+  }
+}
+
+.container .items .item {
+  padding: 10px;
+  border: 1px solid black;
+}
+
+.container .items .item .name {
+  font-weight: bold;
+}
+
+.container .items .item .thumbnail {
+  width: 100%;
+}
+
+.container .pagination {
+  width: 100%;
+  text-align: right;
+  top: 20px;
+  position: relative;
+}
+
+.container .pagination button {
+  padding: 8px;
+  margin: 8px;
+  text-decoration: none;
+  color: #000000;
+  border: none;
+  background-color: #dddddd;
+}
+
+.container .pagination button:hover {
+  background-color: #cccccc;
+}
+
+.container .pagination button.inactive,
+.container .pagination button.inactive:hover {
+  background-color: #cccccc33;
+  color: #00000033;
+  cursor: not-allowed;
+}

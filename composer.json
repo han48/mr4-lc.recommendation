@@ -1,0 +1,35 @@
+{
+    "name": "mr4-lc/recommendation",
+    "description": "Laravel recommendation",
+    "type": "library",
+    "keywords": ["laravel-admin", "extension", "recommendation"],
+    "version": "0.0.1",
+    "homepage": "https://github.com/han48/mr4-lc.recommendation",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Mr4",
+            "email": "zzz4everzzz@live.co.uk"
+        }
+    ],
+    "require": {
+        "php": ">=7.0.0",
+        "mr4-lc/php-json-exporter": "^0.0",
+        "halaxa/json-machine": "^1.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": ">=6.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Mr4Lc\\Recommendation\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Mr4Lc\\Recommendation\\RecommendationServiceProvider"
+            ]
+        }
+    }
+}
