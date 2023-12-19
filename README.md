@@ -17,3 +17,116 @@ Trong đó, J(A,B) là similarity jaccard giữa hai tập hợp A và B, ∣A�
 composer require mr4-lc/recommendation
 php artisan vendor:publish --tag=mr4-lc-recommendation --force
 ```
+
+## Configuration
+
+```php
+return [
+    'featureWeight' => 1,
+    'categoryWeight' => 1,
+    'priceWeight' => 1,
+    'priceHighRange' => 1000,
+
+    'chunkSize' => 1000,
+    'perPage' => 5,
+
+    'output' => storage_path('app/private/recommendation/data'),
+
+    'mapping' => [
+        'tables' => [
+            // Sample config
+            'table_name' => [
+                'data_version' => '0.0.1',
+                'output' => 'table_name.json',
+                // SQL WHERE condition
+                'status' => [
+                    'status' => 1,
+                ],
+                // SQL ORDER BY
+                'order' => 'id',
+                'map' => [
+                    'id' => 'id',
+                    'price' => 'price',
+                    'categories' => ['categories', 'group'], // Array or string column name,
+                    'features' => ['color', 'type'], // Array or string column name,
+                ],
+                'map_type' => [
+                    'categories' => 'merge', // String data
+                    'features' => 'object', // Object data
+                ],
+            ],
+        ],
+    ],
+];
+```
+
+## Usage
+
+Create matrix
+```bash
+php artisan recommendation:export {tableName} {--chunkSize=}
+```
+
+Create similarity (take a long time, Be careful when you run it)
+```bash
+php artisan recommendation:create {tableName} {--id=}
+```
+
+```blade
+<script>
+    function buildView (response, container, ctrl, perPage, pagePrefix) {
+        const items = document.createElement('div')
+        items.className = 'items'
+        response.data.forEach(element => {
+            const div = document.createElement('div')
+            div.className = 'item'
+            if (element.name) {
+                const name = document.createElement('div')
+                name.className = 'name'
+                name.innerHTML = element.name
+                div.appendChild(name)
+            }
+            if (element.images) {
+                const images = JSON.parse(element.images)
+                if (images && images.length > 0) {
+                    const img = document.createElement('img')
+                    img.src = location.origin + '/public/' + images[0]
+                    img.className = 'thumbnail'
+                    div.appendChild(img)
+                }
+            }
+            items.appendChild(div)
+        });
+        container.appendChild(items)
+        const pagination = document.createElement('div')
+        pagination.className = 'pagination'
+        response.links.forEach(element => {
+            const button = document.createElement('button')
+            button.innerHTML = element.label
+            button.className = element.active ? '' : 'inactive'
+            pagination.appendChild(button)
+            const urlParams = new URLSearchParams(element.url)
+            const selectPage = urlParams.get(pagePrefix)
+            button.onclick = () => {
+                LoadRecommendation(ctrl, selectPage, perPage, pagePrefix)
+            }
+        })
+        container.appendChild(pagination)
+    }
+</script>
+<x-mr4-lc.recommendation itemName='wines' itemId='1' apiUrl='http://127.0.0.1:8000/api/recommendation' builder="buildView" />
+```
+
+```blade
+<x-mr4-lc.recommendation itemName='wines' itemId='1' apiUrl='http://127.0.0.1:8000/api/recommendation' />
+```
+
+Controller
+```php
+$fields = request()->validate([
+    'item_name' => ['required'],
+    'item_id' => ['required'],
+]);
+$result = ItemSimilarity::GetSimilarityItems($fields['item_name'], $fields['item_id']);
+return new JsonResponse($result, 200);
+```
