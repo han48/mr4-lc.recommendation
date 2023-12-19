@@ -95,9 +95,12 @@ class ItemSimilarity
                     $currentDataCreatedAt = iterator_to_array(Items::fromFile($this->fileName, ['pointer' => '/created_at']))[0];
                     if ($oldDataCreatedAt > $currentDataCreatedAt) {
                         $hasNew = true;
+                    } else {
+                        unlink($this->matrixFileName);
                     }
-                    $this->writeOutput("$oldDataCreatedAt > $currentDataCreatedAt: " . ($hasNew));
                 }
+            } else {
+                $hasNew = true;
             }
             if ($hasNew) {
                 $product = null;
