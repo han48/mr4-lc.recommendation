@@ -44,6 +44,10 @@ return [
                 ],
                 // SQL ORDER BY
                 'order' => 'id',
+                // Customize model response
+                'model' => \App\Models\SomeModel::class,
+                // Customize similarity
+                'class' => \App\Similarities\PostSimilarity::class,
                 'map' => [
                     'id' => 'id',
                     'price' => 'price',
@@ -58,6 +62,32 @@ return [
         ],
     ],
 ];
+```
+
+```php
+namespace App\Similarities;
+
+use Mr4Lc\Recommendation\Similarity\Similarity;
+
+class PostSimilarity extends \Mr4Lc\Recommendation\Similarity\ItemSimilarity
+{
+    protected function calculateSimilarityScore($productA, $productB)
+    {
+        $productAFeatures = implode('', get_object_vars($productA->features));
+        $productBFeatures = implode('', get_object_vars($productB->features));
+
+        return array_sum([
+            (Similarity::hamming($productAFeatures, $productBFeatures) * $this->featureWeight),
+            (Similarity::jaccard($productA->categories, $productB->categories) * $this->categoryWeight)
+        ]) / ($this->featureWeight + $this->categoryWeight);
+    }
+
+    public static function GetSimilarityPosts($product_id, $page = null, $perPage = null, $pagePrefix = 'page')
+    {
+        $products = static::GetSimilarityItems('posts', $product_id, $page, $perPage, $pagePrefix);
+        return $products;
+    }
+}
 ```
 
 ## Usage
