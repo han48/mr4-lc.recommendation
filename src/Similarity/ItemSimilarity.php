@@ -56,7 +56,11 @@ class ItemSimilarity
         $this->priceHighRange = 0;
         $products = Items::fromFile($this->fileName, $this->pointer);
         foreach ($products as $product) {
-            $this->priceHighRange = max($this->priceHighRange, $product->price);
+            if (property_exists($product, 'price')) {
+                $this->priceHighRange = max($this->priceHighRange, $product->price);
+            } else {
+                break;
+            }
         }
     }
 
@@ -105,7 +109,7 @@ class ItemSimilarity
             if ($hasNew) {
                 $product = null;
                 foreach ($products->getIterator() as $item) {
-                    if ($item->id === $product_id) {
+                    if ($item->id == $product_id) {
                         $product = $item;
                         break;
                     }

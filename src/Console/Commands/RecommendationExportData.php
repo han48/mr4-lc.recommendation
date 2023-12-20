@@ -80,7 +80,10 @@ class RecommendationExportData extends Command
         }
 
         $maps = $configs['map'];
-
+        $modelClass = null;
+        if (array_key_exists('model', $configs)) {
+            $modelClass = $configs['model'];
+        }
         if (!array_key_exists('map_type', $configs)) {
             $configs['map_type'] = [];
         }
@@ -129,7 +132,12 @@ class RecommendationExportData extends Command
                                 $item = new stdClass();
                             }
                             foreach ($value as $column) {
-                                $item->{$column} = $row->{$column};
+                                if (str_ends_with($column, '()') && isset($modelClass)) {
+                                    $method = substr($column, 0, strlen($column) - 2);
+                                    $item->{$column} = call_user_func(array($modelClass, $method), $obj->{'id'});
+                                } else {
+                                    $item->{$column} = $row->{$column};
+                                }
                             }
                             break;
                         default:
