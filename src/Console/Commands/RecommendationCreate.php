@@ -114,17 +114,20 @@ class RecommendationCreate extends Command
             $ids[] = $product->id;
             $products->next();
         }
-
-        $configs = config('mr4recommendation.mapping.tables.' . $tableName);
-        $model = null;
-        if (array_key_exists('model', $configs)) {
-            $model = new $configs['model']();
+        if (count($ids) > 0) {
+            $configs = config('mr4recommendation.mapping.tables.' . $tableName);
+            $model = null;
+            if (array_key_exists('model', $configs)) {
+                $model = new $configs['model']();
+            } else {
+                $model = DB::table($tableName);
+            }
+            $data = $model->whereIn($configs['map']['id'], $ids)
+                ->orderByRaw('FIELD (' . $configs['map']['id'] . ', ' . implode(', ', $ids) . ') ASC')
+                ->get()->toArray();
         } else {
-            $model = DB::table($tableName);
+            $data = [];
         }
-        $data = $model->whereIn($configs['map']['id'], $ids)
-            ->orderByRaw('FIELD (' . $configs['map']['id'] . ', ' . implode(', ', $ids) . ') ASC')
-            ->get()->toArray();
 
         $total = $index + 1;
         $totalPage = intval(ceil($total / $perPage));
@@ -138,15 +141,15 @@ class RecommendationCreate extends Command
         $response->last_page = $totalPage;
         $response->last_page_url = $routePath . '?' . http_build_query(array_merge($params, [$pagePrefix => $totalPage]));
 
-        $nextUrl = $currentPage === $totalPage ? null : $routePath . '?' . http_build_query(array_merge($params, [$pagePrefix => $currentPage + 1]));
+        $nextUrl = $currentPage >= $totalPage ? null : $routePath . '?' . http_build_query(array_merge($params, [$pagePrefix => $currentPage + 1]));
         $currentUrl = $routePath . '?' . http_build_query(array_merge($params, [$pagePrefix => $currentPage]));
-        $prevUrl = $currentPage === 1 ? null : $routePath . '?' . http_build_query(array_merge($params, [$pagePrefix => $page]));
+        $prevUrl = $currentPage <= 1 ? null : $routePath . '?' . http_build_query(array_merge($params, [$pagePrefix => $page]));
 
         $links = [];
         $linkPrevious = new stdClass();
         $linkPrevious->url = $prevUrl;
         $linkPrevious->label = __('pagination.previous');
-        $linkPrevious->active = $currentPage !== 1;
+        $linkPrevious->active = $currentPage > 1;
         $links[] = $linkPrevious;
 
         $linkCurrent = new stdClass();
@@ -158,7 +161,7 @@ class RecommendationCreate extends Command
         $linkNext = new stdClass();
         $linkNext->url = $nextUrl;
         $linkNext->label = __('pagination.next');
-        $linkNext->active = $currentPage !== $totalPage;
+        $linkNext->active = $currentPage < $totalPage;
         $links[] = $linkNext;
 
         $response->links = $links;
