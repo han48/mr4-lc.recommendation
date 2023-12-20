@@ -51,7 +51,10 @@ class RecommendationCreate extends Command
             $fileName = $tableName . '.json';
         }
         $fileName = $this->merge_paths($output, $fileName);
-
+        if (!file_exists($fileName)) {
+            $exporter = new RecommendationExportData();
+            $exporter->exportData($tableName);
+        }
         if (array_key_exists('class', $configs)) {
             $classSimilarity = $configs['class'];
         } else {
