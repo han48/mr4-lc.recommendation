@@ -96,6 +96,7 @@ class RecommendationCreate extends Command
         $matrixFile = (new static())->createMatrix($tableName, $product_id);
         $products = Items::fromFile($matrixFile, ['pointer' => '/matrix'])->getIterator();
         $result = [];
+        $scores = [];
         $ids = [];
         while ($products->valid()) {
             $index++;
@@ -109,6 +110,7 @@ class RecommendationCreate extends Command
             }
             $product = $products->current();
             $result[] = $product;
+            $scores[$product->id . ''] = $product->score;
             $ids[] = $product->id;
             $products->next();
         }
@@ -130,6 +132,7 @@ class RecommendationCreate extends Command
         $response = new stdClass();
         $response->current_page = $currentPage;
         $response->data = $data;
+        $response->scores = $scores;
         $response->first_page_url = $routePath . '?' . http_build_query(array_merge($params, [$pagePrefix => 1]));
         $response->from = $startIndex + 1;
         $response->last_page = $totalPage;
