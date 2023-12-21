@@ -46,6 +46,8 @@ return [
                 'order' => 'id',
                 // Customize model response
                 'model' => \App\Models\SomeModel::class,
+                // Load relatíonhip
+                'model_with' => ['tags'],
                 // Customize similarity
                 'class' => \App\Similarities\PostSimilarity::class,
                 'map' => [
