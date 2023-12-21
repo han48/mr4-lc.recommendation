@@ -119,6 +119,9 @@ class RecommendationCreate extends Command
             $model = null;
             if (array_key_exists('model', $configs)) {
                 $model = new $configs['model']();
+                if (array_key_exists('model_with', $configs)) {
+                    $model = $model->with($configs['model_with']);
+                }
             } else {
                 $model = DB::table($tableName);
             }

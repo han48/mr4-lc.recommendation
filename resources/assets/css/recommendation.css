@@ -32,7 +32,7 @@
 
 .container .items .item {
   padding: 10px;
-  border: 1px solid black;
+  border: 1px solid #00000033;
 }
 
 .container .items .item .name {
